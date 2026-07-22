@@ -282,6 +282,34 @@ with your actual domain, then re-upload the changed files to GitHub (Step 4).
 
 ---
 
+## What's new since your first setup
+
+If you already ran `schema.sql` before this update, run this one additional
+file once in your Supabase SQL Editor: `supabase/migration-01-event-images.sql`.
+It just adds one new column (`image_url`) to your existing `events` table —
+nothing else changes, and no existing data is affected.
+
+**1. Event flyers/images** — the Events tab in your dashboard now has an
+optional image upload, same auto-compression as Teachings cover art.
+
+**2. WhatsApp & Call buttons on every event** — visitors can now express
+interest directly from the Events page/section, no separate step needed.
+These use the same WhatsApp number and phone number set in Site Settings.
+
+**3. Continuous playback across the whole site** — a small floating player
+now appears on every page, not just Teachings. If you start a teaching and
+then browse to another page, it picks up automatically at the same spot.
+
+One honest technical note: because this is a traditional multi-page website
+(each link is a full page load, not an app-style transition), there's a
+fraction-of-a-second gap every time you click to a new page, and on some
+browsers/devices the very first resume after a page load may need one tap
+on the mini-player rather than continuing with zero interaction — this is a
+browser autoplay restriction, not a bug. In practice it feels like the
+teaching almost never stops.
+
+---
+
 ## Troubleshooting
 
 **The site loads but teachings/events don't show up.**

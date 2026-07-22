@@ -76,6 +76,7 @@ create table if not exists events (
   description text,
   event_date date not null,
   tag text,
+  image_url text,
   created_at timestamptz default now()
 );
 

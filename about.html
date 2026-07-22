@@ -139,6 +139,18 @@
   </div>
 </footer>
 
+<div class="mini-player paused" id="miniPlayer">
+  <button class="mini-player-toggle" id="miniPlayerToggle" aria-label="Play or pause SpiritLife Radio">
+    <svg id="miniPlayIcon" viewBox="0 0 24 24" fill="#4A1420"><path d="M8 5v14l11-7z"/></svg>
+    <svg id="miniPauseIcon" viewBox="0 0 24 24" fill="#4A1420" style="display:none"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+  </button>
+  <div class="mini-player-info">
+    <strong id="miniNowPlaying">SpiritLife Radio</strong>
+    <span id="miniNowPlayingSub">Tap play for continuous teachings</span>
+  </div>
+  <div class="mini-player-bars"><i></i><i></i><i></i><i></i></div>
+</div>
+
 <script src="js/supabase-client.js"></script>
 <script src="js/site.js"></script>
 </body>

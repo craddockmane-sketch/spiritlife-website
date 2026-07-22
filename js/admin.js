@@ -245,6 +245,7 @@ async function loadEventsAdmin() {
 
   tbody.innerHTML = data.map((ev) => `
     <tr>
+      <td>${ev.image_url ? `<img class="thumb" src="${ev.image_url}">` : `<div class="thumb" style="background:var(--navy)"></div>`}</td>
       <td><strong>${ev.title}</strong></td>
       <td>${new Date(ev.event_date + "T00:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</td>
       <td>${ev.tag || ""}</td>
@@ -261,6 +262,7 @@ async function loadEventsAdmin() {
 document.getElementById("addEventBtn").addEventListener("click", () => {
   document.getElementById("eventForm").reset();
   document.getElementById("eventId").value = "";
+  document.getElementById("eventImageUrl").value = "";
   document.getElementById("eventModalTitle").textContent = "Add Event";
   openModal("eventModal");
 });
@@ -273,6 +275,7 @@ window.editEvent = async function (id) {
   document.getElementById("eventDescription").value = data.description || "";
   document.getElementById("eventDate").value = data.event_date;
   document.getElementById("eventTag").value = data.tag || "";
+  document.getElementById("eventImageUrl").value = data.image_url || "";
   document.getElementById("eventModalTitle").textContent = "Edit Event";
   openModal("eventModal");
 };
@@ -286,11 +289,35 @@ window.deleteEvent = async function (id) {
 document.getElementById("eventForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const id = document.getElementById("eventId").value;
+  const imageFile = document.getElementById("eventImageFile").files[0];
+  let imageUrl = document.getElementById("eventImageUrl").value;
+
+  if (imageFile) {
+    let compressedBlob;
+    try {
+      compressedBlob = await compressImage(imageFile);
+    } catch (err) {
+      alert("Could not process that image. Please try a different file.");
+      return;
+    }
+    const fileName = `${Date.now()}-event.jpg`;
+    const { error: uploadError } = await supabaseClient.storage
+      .from("covers")
+      .upload(fileName, compressedBlob, { contentType: "image/jpeg" });
+    if (uploadError) {
+      alert("Image upload failed: " + uploadError.message);
+      return;
+    }
+    const { data: urlData } = supabaseClient.storage.from("covers").getPublicUrl(fileName);
+    imageUrl = urlData.publicUrl;
+  }
+
   const payload = {
     title: document.getElementById("eventTitle").value,
     description: document.getElementById("eventDescription").value,
     event_date: document.getElementById("eventDate").value,
     tag: document.getElementById("eventTag").value,
+    image_url: imageUrl || null,
   };
 
   const { error } = id
