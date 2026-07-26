@@ -26,6 +26,15 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+<div class="cookie-banner" id="cookieBanner">
+  <div class="cookie-banner-inner">
+    <p>We use cookies for basic site analytics, only if you agree. See our <a href="privacy.html">Privacy Policy</a> for details.</p>
+    <div class="cookie-banner-actions">
+      <button id="cookieDecline" class="btn btn-outline">Decline</button>
+      <button id="cookieAccept" class="btn btn-primary">Accept</button>
+    </div>
+  </div>
+</div>
 <header>
   <div class="wrap nav">
     <div class="brand">
@@ -37,6 +46,7 @@
       <a href="sundays.html">Sundays</a>
       <a href="teachings.html">Teachings</a>
       <a href="events.html">Events</a>
+      <a href="gallery.html">Gallery</a>
       <a href="giving.html">Giving</a>
       <a href="contact.html">Contact</a>
     </nav>
@@ -94,12 +104,14 @@
         <h5>Explore</h5>
         <a href="about.html">About Us</a>
         <a href="events.html">Events</a>
+        <a href="gallery.html">Gallery</a>
         <a href="giving.html">Giving</a>
       </div>
     </div>
     <div class="foot-bottom">
       <span>&copy; 2026 SpiritLife International. All rights reserved.</span>
       <span>"They are spirit, and they are life." &mdash; John 6:63</span>
+      <a href="#" id="cookieSettingsLink" style="color:rgba(255,255,255,.55); text-decoration:underline;">Cookie Settings</a>
     </div>
   </div>
 </footer>
@@ -117,6 +129,7 @@
 </div>
 
 <script src="js/supabase-client.js"></script>
+<script src="js/analytics.js"></script>
 <script src="js/site.js"></script>
 </body>
 </html>

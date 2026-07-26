@@ -26,6 +26,15 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+<div class="cookie-banner" id="cookieBanner">
+  <div class="cookie-banner-inner">
+    <p>We use cookies for basic site analytics, only if you agree. See our <a href="privacy.html">Privacy Policy</a> for details.</p>
+    <div class="cookie-banner-actions">
+      <button id="cookieDecline" class="btn btn-outline">Decline</button>
+      <button id="cookieAccept" class="btn btn-primary">Accept</button>
+    </div>
+  </div>
+</div>
 <header>
   <div class="wrap nav">
     <div class="brand">
@@ -37,6 +46,7 @@
       <a href="sundays.html">Sundays</a>
       <a href="teachings.html">Teachings</a>
       <a href="events.html">Events</a>
+      <a href="gallery.html">Gallery</a>
       <a href="giving.html">Giving</a>
       <a href="contact.html">Contact</a>
     </nav>
@@ -63,7 +73,7 @@
     <h3 style="margin:24px 0 10px;">What we collect</h3>
     <p style="color:var(--ink-soft); margin-bottom:16px;">When you use our contact form, we collect the name, email address, and message you provide, solely to respond to your enquiry. We do not sell or share this information with third parties.</p>
     <h3 style="margin:24px 0 10px;">Cookies &amp; analytics</h3>
-    <p style="color:var(--ink-soft); margin-bottom:16px;">This site may use basic, privacy-respecting analytics to understand how visitors use the site. No personal data is sold or used for advertising.</p>
+    <p style="color:var(--ink-soft); margin-bottom:16px;">This site does not set any analytics cookies until you explicitly accept them via the cookie banner shown on your first visit. If you accept, we use Google Analytics to understand general visitor numbers and which pages are popular — this data is anonymised and is never sold or used for advertising. If you decline, no analytics cookie is set. You can change your choice at any time using the "Cookie Settings" link in the footer.</p>
     <h3 style="margin:24px 0 10px;">Contact</h3>
     <p style="color:var(--ink-soft);">If you have any questions about this policy, please reach out via our <a href="contact.html" style="color:var(--maroon); font-weight:600;">Contact page</a>.</p>
   </div>
@@ -97,12 +107,14 @@
         <h5>Explore</h5>
         <a href="about.html">About Us</a>
         <a href="events.html">Events</a>
+        <a href="gallery.html">Gallery</a>
         <a href="giving.html">Giving</a>
       </div>
     </div>
     <div class="foot-bottom">
       <span>&copy; 2026 SpiritLife International. All rights reserved.</span>
       <span>"They are spirit, and they are life." &mdash; John 6:63</span>
+      <a href="#" id="cookieSettingsLink" style="color:rgba(255,255,255,.55); text-decoration:underline;">Cookie Settings</a>
     </div>
   </div>
 </footer>
@@ -120,6 +132,7 @@
 </div>
 
 <script src="js/supabase-client.js"></script>
+<script src="js/analytics.js"></script>
 <script src="js/site.js"></script>
 </body>
 </html>

@@ -29,6 +29,10 @@ create table if not exists site_settings (
   facebook_url text,
   instagram_url text,
   youtube_url text,
+  hero_image_url text,
+  about_image_url text,
+  sundays_image_1_url text,
+  sundays_image_2_url text,
   constraint single_row check (id = 1)
 );
 
@@ -69,6 +73,14 @@ create table if not exists teachings (
   created_at timestamptz default now()
 );
 
+-- ---------- TABLE: gallery_images ----------
+create table if not exists gallery_images (
+  id uuid primary key default gen_random_uuid(),
+  image_url text not null,
+  caption text,
+  created_at timestamptz default now()
+);
+
 -- ---------- TABLE: events ----------
 create table if not exists events (
   id uuid primary key default gen_random_uuid(),
@@ -89,11 +101,13 @@ create table if not exists events (
 alter table site_settings enable row level security;
 alter table teachings enable row level security;
 alter table events enable row level security;
+alter table gallery_images enable row level security;
 
 -- Public read access
 create policy "Public can read site_settings" on site_settings for select using (true);
 create policy "Public can read teachings" on teachings for select using (true);
 create policy "Public can read events" on events for select using (true);
+create policy "Public can read gallery_images" on gallery_images for select using (true);
 
 -- Admin (any authenticated user) can write
 create policy "Admin can update site_settings" on site_settings for update using (auth.role() = 'authenticated');
@@ -106,16 +120,28 @@ create policy "Admin can insert events" on events for insert with check (auth.ro
 create policy "Admin can update events" on events for update using (auth.role() = 'authenticated');
 create policy "Admin can delete events" on events for delete using (auth.role() = 'authenticated');
 
+create policy "Admin can insert gallery_images" on gallery_images for insert with check (auth.role() = 'authenticated');
+create policy "Admin can delete gallery_images" on gallery_images for delete using (auth.role() = 'authenticated');
+
 -- =========================================================
--- STORAGE (for cover art images only — audio lives on R2)
+-- STORAGE (cover art, event flyers, and gallery photos —
+-- audio itself lives on R2, not here)
 -- =========================================================
 insert into storage.buckets (id, name, public)
 values ('covers', 'covers', true)
 on conflict (id) do nothing;
 
+insert into storage.buckets (id, name, public)
+values ('gallery', 'gallery', true)
+on conflict (id) do nothing;
+
 create policy "Public can view covers" on storage.objects for select using (bucket_id = 'covers');
 create policy "Admin can upload covers" on storage.objects for insert with check (bucket_id = 'covers' and auth.role() = 'authenticated');
 create policy "Admin can delete covers" on storage.objects for delete using (bucket_id = 'covers' and auth.role() = 'authenticated');
+
+create policy "Public can view gallery" on storage.objects for select using (bucket_id = 'gallery');
+create policy "Admin can upload gallery" on storage.objects for insert with check (bucket_id = 'gallery' and auth.role() = 'authenticated');
+create policy "Admin can delete gallery" on storage.objects for delete using (bucket_id = 'gallery' and auth.role() = 'authenticated');
 
 -- =========================================================
 -- DONE. Next step: README.md Step 4 (create your admin login).

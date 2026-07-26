@@ -28,6 +28,7 @@ function showDashboard() {
   adminShell.classList.add("active");
   loadTeachingsAdmin();
   loadEventsAdmin();
+  loadGalleryAdmin();
   loadSettingsForm();
 }
 
@@ -333,6 +334,75 @@ document.getElementById("eventForm").addEventListener("submit", async (e) => {
 });
 
 /* =========================================================
+   GALLERY
+   ========================================================= */
+async function loadGalleryAdmin() {
+  const grid = document.getElementById("galleryAdminGrid");
+  const { data, error } = await supabaseClient
+    .from("gallery_images")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    grid.innerHTML = "Could not load gallery.";
+    return;
+  }
+  if (!data.length) {
+    grid.innerHTML = `<p style="color:var(--ink-soft);">No photos yet. Click "+ Add Photos" to upload some.</p>`;
+    return;
+  }
+
+  grid.innerHTML = data.map((img) => `
+    <div class="gallery-admin-item">
+      <img src="${img.image_url}">
+      <button onclick="deleteGalleryImage('${img.id}')" aria-label="Delete photo">&times;</button>
+    </div>
+  `).join("");
+}
+
+document.getElementById("addGalleryBtn").addEventListener("click", () => {
+  document.getElementById("galleryFileInput").click();
+});
+
+document.getElementById("galleryFileInput").addEventListener("change", async (e) => {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
+
+  const grid = document.getElementById("galleryAdminGrid");
+  const progressNote = document.createElement("div");
+  progressNote.className = "gallery-upload-progress";
+  grid.prepend(progressNote);
+
+  let done = 0;
+  for (const file of files) {
+    progressNote.textContent = `Uploading ${done + 1} of ${files.length}…`;
+    try {
+      const compressedBlob = await compressImage(file, 1600, 300);
+      const fileName = `${Date.now()}-${done}-gallery.jpg`;
+      const { error: uploadError } = await supabaseClient.storage
+        .from("gallery")
+        .upload(fileName, compressedBlob, { contentType: "image/jpeg" });
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabaseClient.storage.from("gallery").getPublicUrl(fileName);
+      await supabaseClient.from("gallery_images").insert({ image_url: urlData.publicUrl });
+    } catch (err) {
+      console.error("Gallery upload failed for", file.name, err);
+    }
+    done++;
+  }
+
+  e.target.value = "";
+  loadGalleryAdmin();
+});
+
+window.deleteGalleryImage = async function (id) {
+  if (!confirm("Delete this photo?")) return;
+  await supabaseClient.from("gallery_images").delete().eq("id", id);
+  loadGalleryAdmin();
+};
+
+/* =========================================================
    SITE SETTINGS
    ========================================================= */
 async function loadSettingsForm() {
@@ -345,6 +415,7 @@ async function loadSettingsForm() {
     "contact_phone", "contact_phone_display", "contact_email",
     "bank_account_name", "bank_sort_code", "bank_account_number",
     "facebook_url", "instagram_url", "youtube_url",
+    "hero_image_url", "about_image_url", "sundays_image_1_url", "sundays_image_2_url",
   ];
   fields.forEach((f) => {
     const el = document.getElementById("set_" + f);
@@ -354,12 +425,48 @@ async function loadSettingsForm() {
 
 document.getElementById("settingsForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  const note = document.getElementById("settingsSaveNote");
+  note.textContent = "Saving…";
+  note.style.color = "var(--ink-soft)";
+  note.classList.add("show");
+
+  // Upload any newly-selected photos first
+  const photoSpots = [
+    { fileId: "photo_hero", urlId: "set_hero_image_url" },
+    { fileId: "photo_about", urlId: "set_about_image_url" },
+    { fileId: "photo_sundays1", urlId: "set_sundays_image_1_url" },
+    { fileId: "photo_sundays2", urlId: "set_sundays_image_2_url" },
+  ];
+
+  for (const spot of photoSpots) {
+    const fileInput = document.getElementById(spot.fileId);
+    const file = fileInput.files[0];
+    if (!file) continue;
+
+    try {
+      const compressedBlob = await compressImage(file, 1920, 400);
+      const fileName = `${Date.now()}-${spot.fileId}.jpg`;
+      const { error: uploadError } = await supabaseClient.storage
+        .from("covers")
+        .upload(fileName, compressedBlob, { contentType: "image/jpeg" });
+      if (uploadError) throw uploadError;
+      const { data: urlData } = supabaseClient.storage.from("covers").getPublicUrl(fileName);
+      document.getElementById(spot.urlId).value = urlData.publicUrl;
+    } catch (err) {
+      note.textContent = `Could not upload photo for "${spot.fileId}": ${err.message}`;
+      note.style.color = "#B23A48";
+      return;
+    }
+  }
+
   const fields = [
     "hero_title", "hero_lead", "about_text_1", "about_text_2", "about_text_3",
     "sunday_time", "sunday_address", "prayer_time", "prayer_address", "online_time",
     "contact_phone", "contact_phone_display", "contact_email",
     "bank_account_name", "bank_sort_code", "bank_account_number",
     "facebook_url", "instagram_url", "youtube_url",
+    "hero_image_url", "about_image_url", "sundays_image_1_url", "sundays_image_2_url",
   ];
   const payload = {};
   fields.forEach((f) => {
@@ -368,7 +475,6 @@ document.getElementById("settingsForm").addEventListener("submit", async (e) => 
   });
 
   const { error } = await supabaseClient.from("site_settings").update(payload).eq("id", 1);
-  const note = document.getElementById("settingsSaveNote");
   if (error) {
     note.textContent = "Could not save: " + error.message;
     note.style.color = "#B23A48";

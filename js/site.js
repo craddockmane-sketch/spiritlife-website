@@ -77,6 +77,32 @@ async function loadSiteSettings() {
   if (data.facebook_url) document.querySelectorAll("[data-social='facebook']").forEach(el => el.href = data.facebook_url);
   if (data.instagram_url) document.querySelectorAll("[data-social='instagram']").forEach(el => el.href = data.instagram_url);
   if (data.youtube_url) document.querySelectorAll("[data-social='youtube']").forEach(el => el.href = data.youtube_url);
+
+  // Real photos in place of the default line-art placeholders, if uploaded
+  applySpotPhoto("heroSection", data.hero_image_url, true);
+  applySpotPhoto("aboutVisualHome", data.about_image_url);
+  applySpotPhoto("aboutVisualMain", data.about_image_url);
+  applySpotPhoto("sundaysVisual1", data.sundays_image_1_url);
+  applySpotPhoto("sundaysVisual2", data.sundays_image_2_url);
+}
+
+function applySpotPhoto(elementId, imageUrl, isHero) {
+  const el = document.getElementById(elementId);
+  if (!el || !imageUrl) return;
+
+  const wing = el.querySelector(".wing");
+  if (wing) wing.style.display = "none";
+
+  if (isHero) {
+    // Layer the brand gradient over the photo so hero text stays readable
+    el.style.backgroundImage = `linear-gradient(160deg, rgba(28,41,81,.82) 0%, rgba(28,41,81,.7) 38%, rgba(110,30,48,.75) 100%), url('${imageUrl}')`;
+    el.style.backgroundSize = "cover";
+    el.style.backgroundPosition = "center";
+  } else {
+    el.style.backgroundImage = `url('${imageUrl}')`;
+    el.style.backgroundSize = "cover";
+    el.style.backgroundPosition = "center";
+  }
 }
 
 /* ---------- TEACHINGS ---------- */
@@ -321,6 +347,53 @@ async function loadEvents() {
   }).join("");
 }
 
+/* ---------- GALLERY ---------- */
+async function loadGallery() {
+  const grid = document.getElementById("galleryGrid");
+  if (!grid) return;
+
+  const { data, error } = await supabaseClient
+    .from("gallery_images")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error || !data || data.length === 0) {
+    grid.innerHTML = `<p class="gallery-empty">No photos uploaded yet — check back soon.</p>`;
+    return;
+  }
+
+  grid.innerHTML = data.map(img => `
+    <div class="gallery-item" data-full="${esc(img.image_url)}">
+      <img src="${esc(img.image_url)}" alt="${esc(img.caption || "SpiritLife International")}" loading="lazy">
+    </div>
+  `).join("");
+
+  setupLightbox();
+}
+
+function setupLightbox() {
+  const overlay = document.getElementById("lightboxOverlay");
+  const closeBtn = document.getElementById("lightboxClose");
+  const imgEl = document.getElementById("lightboxImage");
+  if (!overlay) return;
+
+  document.querySelectorAll(".gallery-item").forEach(item => {
+    item.addEventListener("click", () => {
+      imgEl.src = item.getAttribute("data-full");
+      overlay.classList.add("active");
+    });
+  });
+
+  const closeLightbox = () => overlay.classList.remove("active");
+  closeBtn.addEventListener("click", closeLightbox);
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) closeLightbox();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeLightbox();
+  });
+}
+
 /* ---------- CONTACT FORM ---------- */
 function setupContactForm() {
   const form = document.getElementById("contactForm");
@@ -377,5 +450,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadSiteSettings();
   loadTeachings();
   loadEvents();
+  loadGallery();
   setupContactForm();
 });

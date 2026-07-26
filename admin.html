@@ -45,6 +45,7 @@
     <div class="wrap" style="display:flex;">
       <button class="active" data-panel="panelTeachings">Teachings</button>
       <button data-panel="panelEvents">Events</button>
+      <button data-panel="panelGallery">Gallery</button>
       <button data-panel="panelSettings">Site Settings</button>
     </div>
   </div>
@@ -82,10 +83,54 @@
       </table>
     </div>
 
+    <!-- GALLERY PANEL -->
+    <div class="admin-panel" id="panelGallery">
+      <div class="admin-panel-head">
+        <h2>Gallery</h2>
+        <div>
+          <input type="file" id="galleryFileInput" accept="image/*" multiple style="display:none;">
+          <button class="btn btn-primary" id="addGalleryBtn">+ Add Photos</button>
+        </div>
+      </div>
+      <div class="help-box">
+        Select one or more photos to upload — each is automatically resized
+        and compressed. You can select multiple files at once from your
+        phone or computer's photo picker.
+      </div>
+      <div class="gallery-admin-grid" id="galleryAdminGrid">Loading&hellip;</div>
+    </div>
+
     <!-- SETTINGS PANEL -->
     <div class="admin-panel" id="panelSettings">
       <div class="admin-panel-head"><h2>Site Settings</h2></div>
       <form class="settings-form" id="settingsForm">
+
+        <h4>Photos</h4>
+        <div class="help-box">
+          These replace the default design graphics on the site with real
+          photos. Each is automatically resized and compressed on upload.
+          Leave any of these empty to keep the default look for that spot.
+        </div>
+        <div class="form-field">
+          <label>Homepage Hero Photo (wide, well-lit — worship, congregation, or building)</label>
+          <input type="file" id="photo_hero" accept="image/*">
+          <input type="hidden" id="set_hero_image_url">
+        </div>
+        <div class="form-field">
+          <label>About Page Photo</label>
+          <input type="file" id="photo_about" accept="image/*">
+          <input type="hidden" id="set_about_image_url">
+        </div>
+        <div class="form-field">
+          <label>Sundays Page &mdash; Photo 1 (Prayer Service section)</label>
+          <input type="file" id="photo_sundays1" accept="image/*">
+          <input type="hidden" id="set_sundays_image_1_url">
+        </div>
+        <div class="form-field">
+          <label>Sundays Page &mdash; Photo 2 (Online Prayers section)</label>
+          <input type="file" id="photo_sundays2" accept="image/*">
+          <input type="hidden" id="set_sundays_image_2_url">
+        </div>
 
         <h4>Homepage</h4>
         <div class="form-field"><label>Hero Title</label><input id="set_hero_title" type="text"></div>

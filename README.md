@@ -300,6 +300,41 @@ These use the same WhatsApp number and phone number set in Site Settings.
 now appears on every page, not just Teachings. If you start a teaching and
 then browse to another page, it picks up automatically at the same spot.
 
+**4. Cookie consent banner + Google Analytics support** — the site now
+asks visitors' permission before any analytics cookie is set, and is ready
+to connect to Google Analytics the moment you want visitor stats (Step 10).
+No code changes needed to add this later if you skip it for now — nothing
+loads or tracks anyone until you both add your GA ID and a visitor accepts.
+
+**5. Photo Gallery** — a new "Gallery" page and dashboard tab. Upload as
+many photos as you like from the dashboard (select multiple at once) —
+each is automatically resized and compressed, same as teaching cover art
+and event flyers. Visitors can click any photo to view it full-size.
+
+If you already ran `schema.sql` before this update, also run
+`supabase/migration-02-gallery.sql` once in your Supabase SQL Editor —
+it adds the gallery table and storage bucket, nothing else changes.
+
+**6. Real photos for the hero, About, and Sundays pages** — Site Settings
+now has a "Photos" section where you can upload real church photos to
+replace the default line-art graphics on the homepage hero, About page,
+and both photo spots on the Sundays page. Auto-compressed on upload, same
+as everywhere else.
+
+Run `supabase/migration-03-site-photos.sql` once in your Supabase SQL
+Editor if your database already existed before this update.
+
+> **One honest limitation:** the small preview image shown when your site
+> link is shared on WhatsApp/Facebook (`og-image.jpg`) can **not** be made
+> dashboard-editable the way these other photos are. Social apps read that
+> image directly from the page's code before any of your dashboard content
+> loads, so it has to stay a real file in the project rather than something
+> pulled from the database. To change it, replace `og-image.jpg` in the
+> project folder with your own image (1200×630px works best) and re-upload
+> it to GitHub. If this is something you'd like made dashboard-editable
+> too, it's possible but requires a more advanced setup — ask if you want
+> that built.
+
 One honest technical note: because this is a traditional multi-page website
 (each link is a full page load, not an app-style transition), there's a
 fraction-of-a-second gap every time you click to a new page, and on some
@@ -307,6 +342,39 @@ browsers/devices the very first resume after a page load may need one tap
 on the mini-player rather than continuing with zero interaction — this is a
 browser autoplay restriction, not a bug. In practice it feels like the
 teaching almost never stops.
+
+---
+
+## STEP 10 — Add Google Analytics (optional but already built in)
+
+The site now includes a proper cookie consent banner and is wired up to
+support Google Analytics — you just need to create a free GA4 property and
+paste in one ID.
+
+1. Go to **analytics.google.com** and sign in with a Google account.
+2. Click **Admin** (gear icon) → **Create Property**.
+   - Name it "SpiritLife International"
+   - Set your timezone/currency (UK)
+3. When asked about a data stream, choose **Web**, enter your site URL
+   (spiritlifeinternational.org), and give it a name.
+4. Google will show you a **Measurement ID** that looks like `G-XXXXXXXXXX`.
+   Copy it.
+5. Open `js/analytics.js` from this project folder in a text editor.
+6. Replace `PASTE_YOUR_GA_MEASUREMENT_ID_HERE` with your real Measurement ID
+   (keep the quote marks). Save.
+7. Upload the updated `js/analytics.js` to GitHub (same drag-and-drop
+   process as before). Vercel redeploys automatically.
+
+**How the cookie banner works:** on a visitor's first visit, a banner asks
+whether they'll allow analytics cookies. If they click **Accept**, Google
+Analytics loads and starts counting visits. If they click **Decline**,
+nothing loads and no cookie is set. Visitors can change their mind anytime
+via the **Cookie Settings** link in the footer. This is genuinely
+compliant with UK/EU cookie law — no analytics runs without consent.
+
+If you'd rather not add analytics at all, that's completely fine — the
+cookie banner and site work perfectly well with the Measurement ID left as
+the placeholder; visitors will just never see any analytics load either way.
 
 ---
 
