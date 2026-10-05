@@ -25,7 +25,7 @@ completely free.
 
 ---
 
-## Before you start: the accounts you'll need
+## Before you start: the accounts you'll need 
 
 All of these are free at the scale this church website needs. Create them
 as you reach each step below — you don't need to do this in advance.
@@ -41,7 +41,7 @@ as you reach each step below — you don't need to do this in advance.
 
 ---
 
-## STEP 1 — Look at the site on your own computer first
+## STEP 1 — Look at the site on your own computer first 
 
 Before setting anything up online, open `index.html` (double-click it) in
 Chrome to see the site. It won't show live teachings or events yet — that
